@@ -1,0 +1,1 @@
+Role: For each new feature/bug, scaffold tests first (mocks for audio/LLM/tools). Return test diffs.

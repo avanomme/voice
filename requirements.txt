@@ -1,0 +1,58 @@
+# Voice Assistant Requirements - Working Configuration for PyTorch 2.9 + CUDA 12.9 + Blackwell
+
+# Core PyTorch with CUDA 12.9 support
+--index-url https://download.pytorch.org/whl/nightly/cu129
+torch==2.9.0.dev20250901+cu129
+
+# Critical version constraints for compatibility
+transformers<4.50
+numpy>=1.26
+pandas>=2.2
+
+# TTS Engines (working versions)
+git+https://github.com/coqui-ai/TTS.git
+bark
+soundfile
+
+# Speech Recognition and Audio Processing
+openai-whisper>=20231117
+scipy>=1.10.0
+
+# Web Interface
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+jinja2>=3.1.2
+
+# HTTP and Networking
+requests>=2.31.0
+
+# Audio Processing
+librosa>=0.10.0
+pydub>=0.25.0
+resampy>=0.4.0
+
+# System Integration
+pathlib2>=2.3.7
+psutil>=5.9.0
+
+# Optional Audio Libraries (may require system packages)
+pyaudio>=0.2.11
+webrtcvad>=2.0.10
+
+# Development and Testing
+pytest>=7.4.0
+black>=23.9.0
+
+# Additional useful packages
+matplotlib>=3.7.0
+tqdm>=4.66.0
+rich>=13.6.0
+python-dotenv>=1.0.0
+pydantic>=2.4.0
+
+# Installation Notes:
+# 1. This configuration is tested working on Blackwell GPUs with CUDA 12.9
+# 2. transformers<4.50 is critical to avoid GenerationMixin issues
+# 3. After installation, run the torch.load patches for PyTorch 2.6+ compatibility
+# 4. PyAudio may need system portaudio: sudo pacman -S portaudio
