@@ -1,0 +1,48 @@
+# Logs
+logs/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.env
+.ENV
+
+# Audio files
+*.wav
+*.mp3
+*.flac
+*.ogg
+
+# Model files
+models/
+*.onnx
+*.bin
+*.pt
+*.pth
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Project organization
+deprecated/
+tools/*.log
+scripts/*.log

@@ -5,7 +5,11 @@
     "Split large patches into smaller, focused changes",
     "Preserve existing code style and patterns",
     "No comments in code unless explicitly requested",
-    "Test critical paths after changes"
+    "Test critical paths after changes",
+    "Always test voice/audio functionality after TTS changes",
+    "Maintain error logging for all voice assistant operations",
+    "Keep wake word detection responsive and efficient",
+    "Preserve British/Irish/Australian voice model priorities"
   ],
   "tools": {
     "filesystem": {
@@ -64,5 +68,22 @@
     "debug_mode": false,
     "log_level": "INFO",
     "performance_monitoring": true
+  },
+  "testing": {
+    "run_lint_command": "ruff check src/",
+    "run_test_command": "python -m pytest tests/ -v",
+    "voice_test_command": "python src/assistant/web_voice_assistant.py --test-voice",
+    "quick_test_urls": [
+      "http://localhost:8765/health",
+      "http://localhost:8765/wake-word/status"
+    ]
+  },
+  "project_metadata": {
+    "name": "Voice Assistant",
+    "description": "Multi-engine TTS voice assistant with wake word detection",
+    "version": "1.0.0",
+    "main_engines": ["coqui", "bark", "piper"],
+    "features": ["wake_word", "voice_cloning", "multi_accent", "error_logging"],
+    "last_bootstrap": "2025-09-21"
   }
 }

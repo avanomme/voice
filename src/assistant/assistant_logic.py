@@ -39,7 +39,7 @@ class VoiceAssistant:
         if len(self.conversation_history) > 20:
             self.conversation_history = self.conversation_history[-20:]
     
-    def query_ollama_with_thinking(self, text: str, model: str = "qwen3:latest") -> Tuple[str, str]:
+    def query_ollama_with_thinking(self, text: str, model: str = "mistral:latest") -> Tuple[str, str]:
         """
         Send text to Ollama and get structured thinking + response
         Returns (thinking, response) tuple
@@ -52,24 +52,14 @@ class VoiceAssistant:
             
             context_str = "\n".join(context_messages) if context_messages else ""
             
-            # Structured prompt for thinking
-            thinking_prompt = f"""Previous conversation context:
-{context_str}
+            # Simplified prompt for faster response
+            thinking_prompt = f"""Context: {context_str}
 
-Current user message: {text}
+User: {text}
 
-Please provide a structured response with your thinking process and final answer. Format your response EXACTLY as follows:
-
-THINKING:
-[Show your detailed reasoning process here. Consider the context, analyze the request, think through potential approaches, and explain your reasoning step by step.]
-
-RESPONSE:
-[Provide your final, conversational answer here. This should be natural and engaging, as if speaking to the user directly.]
-
-Remember:
-- THINKING section should show your internal reasoning
-- RESPONSE section should be conversational and natural
-- Always include both sections with the exact headers shown above"""
+Respond with:
+THINKING: [Brief reasoning]
+RESPONSE: [Natural, helpful reply]"""
             
             payload = {
                 "model": model,
@@ -77,7 +67,7 @@ Remember:
                 "stream": False
             }
             
-            response = requests.post(self.ollama_url, json=payload, timeout=45)
+            response = requests.post(self.ollama_url, json=payload, timeout=90)
             response.raise_for_status()
             
             full_response = response.json()["response"]

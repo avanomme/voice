@@ -17,6 +17,7 @@ from pathlib import Path
 
 # Import error logging
 from error_logger import log_wake_word_error, log_audio_error
+from audio_manager import get_audio_manager
 
 try:
     import webrtcvad
@@ -48,10 +49,14 @@ class WakeWordDetector:
             self.vad = None
 
         # Audio setup
-        self.audio = None
+        self.audio_manager = get_audio_manager()
         self.stream = None
         self.is_listening = False
         self.permission_granted = False
+
+        # Whisper model check (cache the result to avoid spam)
+        self.whisper_available = None
+        self.whisper_warned = False
 
         # Callbacks
         self.on_wake_word: Optional[Callable] = None
@@ -66,22 +71,16 @@ class WakeWordDetector:
         Returns True if permission granted, False otherwise
         """
         try:
-            # Test microphone access
-            test_audio = pyaudio.PyAudio()
-            test_stream = test_audio.open(
-                format=pyaudio.paInt16,
-                channels=1,
-                rate=self.sample_rate,
-                input=True,
-                frames_per_buffer=self.chunk_size
-            )
+            # Use audio manager to test microphone access
+            test_stream = self.audio_manager.create_input_stream(self.chunk_size)
+            if test_stream is None:
+                raise Exception("Failed to create audio input stream")
 
             # Try to read a small amount of data
+            test_stream.start_stream()
             _ = test_stream.read(self.chunk_size, exception_on_overflow=False)
-
             test_stream.stop_stream()
             test_stream.close()
-            test_audio.terminate()
 
             self.permission_granted = True
             self.logger.info("Microphone permission granted")
@@ -124,15 +123,12 @@ class WakeWordDetector:
             return True
 
         try:
-            self.audio = pyaudio.PyAudio()
-            self.stream = self.audio.open(
-                format=pyaudio.paInt16,
-                channels=1,
-                rate=self.sample_rate,
-                input=True,
-                frames_per_buffer=self.chunk_size
-            )
+            # Use audio manager to create stream
+            self.stream = self.audio_manager.create_input_stream(self.chunk_size)
+            if self.stream is None:
+                raise Exception("Failed to create audio input stream")
 
+            self.stream.start_stream()
             self.is_listening = True
             self.listening_thread = threading.Thread(target=self._listen_loop, daemon=True)
             self.listening_thread.start()
@@ -154,12 +150,6 @@ class WakeWordDetector:
                 self.stream.close()
             except Exception as e:
                 log_audio_error("stopping stream", e)
-
-        if self.audio:
-            try:
-                self.audio.terminate()
-            except Exception as e:
-                log_audio_error("terminating audio", e)
 
         self.logger.info("Stopped continuous listening")
 
@@ -207,19 +197,36 @@ class WakeWordDetector:
                 wf.writeframes(b''.join(audio_buffer))
                 wf.close()
 
-                # Transcribe using Whisper
-                try:
-                    from voice_models import whisper_model
-                    result = whisper_model.transcribe(f.name)
-                    text = result["text"].strip()
+                # Transcribe using Whisper (check once and cache result)
+                if self.whisper_available is None:
+                    try:
+                        import whisper
+                        self.whisper_model = whisper.load_model("base")
+                        self.whisper_available = True
+                        self.logger.info("Whisper model loaded for wake word detection")
+                    except ImportError:
+                        self.whisper_available = False
+                        if not self.whisper_warned:
+                            self.logger.warning("Whisper not available - wake word detection disabled")
+                            self.whisper_warned = True
+                    except Exception as e:
+                        self.whisper_available = False
+                        if not self.whisper_warned:
+                            self.logger.warning("Whisper model not available for wake word transcription")
+                            self.whisper_warned = True
 
-                    # Check for wake words
-                    if self._contains_wake_word(text):
-                        self.logger.info(f"Wake word detected: {text}")
-                        if self.on_wake_word:
-                            self.on_wake_word(text)
-                except ImportError:
-                    self.logger.warning("Whisper model not available for wake word transcription")
+                if self.whisper_available:
+                    try:
+                        result = self.whisper_model.transcribe(f.name)
+                        text = result["text"].strip()
+
+                        # Check for wake words
+                        if self._contains_wake_word(text):
+                            self.logger.info(f"Wake word detected: {text}")
+                            if self.on_wake_word:
+                                self.on_wake_word(text)
+                    except Exception as e:
+                        log_wake_word_error(e)
 
                 os.unlink(f.name)
 

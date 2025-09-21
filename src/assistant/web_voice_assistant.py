@@ -4,11 +4,12 @@ Updated Voice Assistant Web UI
 Integrates with modular TTS engines and voice models
 """
 
-from fastapi import FastAPI, UploadFile, File, Request
+from fastapi import FastAPI, UploadFile, File, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 import os
 import tempfile
 import logging
+import requests
 
 # Import our new modular components
 from voice_models import get_all_voices, get_recommended_voices, TTS_ENGINES
@@ -45,6 +46,17 @@ def on_permission_error(error_msg):
 wake_detector.on_wake_word = on_wake_word_detected
 wake_detector.on_speech_detected = on_speech_detected
 wake_detector.on_permission_error = on_permission_error
+
+def get_available_ollama_models():
+    """Get list of available Ollama models"""
+    try:
+        response = requests.get("http://localhost:11434/api/tags", timeout=5)
+        if response.status_code == 200:
+            models = response.json().get("models", [])
+            return [model["name"] for model in models]
+        return ["mistral:latest"]  # fallback
+    except:
+        return ["mistral:latest"]  # fallback
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
@@ -677,10 +689,14 @@ async def transcribe_audio(audio: UploadFile = File(...)):
         return {"error": str(e)}
 
 @app.post("/chat")
-async def chat(message: str = None, voice: str = None, clone_audio: UploadFile = File(None)):
+async def chat(message: str = Form(...), voice: str = Form(None), clone_audio: UploadFile = File(None)):
     """Get AI response with thinking and generate speech"""
     try:
-        if not message:
+        # Debug logging
+        logging.info(f"Chat endpoint received: message='{message}', voice='{voice}'")
+
+        if not message or not message.strip():
+            logging.error(f"Empty message received: '{message}'")
             return {"error": "No message provided"}
         
         # Get conversation session
@@ -752,6 +768,7 @@ async def test_voice(request: dict):
         
         return {"audio": audio_base64}
     except Exception as e:
+        log_tts_error(engine, voice_id, e)
         return {"error": str(e)}
 
 @app.get("/stats")
@@ -768,6 +785,7 @@ async def get_stats():
             "avg_response_time": "2.3"
         }
     except Exception as e:
+        log_web_interface_error("stats", e)
         return {"error": str(e)}
 
 @app.post("/wake-word/start")
@@ -832,9 +850,19 @@ async def health_check():
             "error": str(e)
         }
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global exception handler for unhandled errors"""
+    log_web_interface_error(f"unhandled error at {request.url.path}", exc)
+    return JSONResponse(
+        status_code=500,
+        content={"error": "Internal server error", "detail": str(exc)}
+    )
+
 if __name__ == "__main__":
     import uvicorn
     print("Starting Multi-Engine Voice Assistant Web UI...")
-    print("Features: Coqui XTTS v2, Bark, Piper | 40+ UK/Irish voices | Voice cloning")
+    print("Features: Coqui XTTS v2, Bark, Piper | 50+ voices | Wake word | Error logging")
     print("Access at: http://localhost:8765")
+    print(f"Error logs: {error_logger.log_dir}")
     uvicorn.run(app, host="0.0.0.0", port=8765)

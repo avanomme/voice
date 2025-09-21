@@ -18,10 +18,12 @@ class VoiceAssistantLogger:
         Initialize the logging system
 
         Args:
-            log_dir: Directory to store log files. Defaults to ~/.local/share/voice_assistant/logs/
+            log_dir: Directory to store log files. Defaults to ./logs/ in the project directory
         """
         if log_dir is None:
-            self.log_dir = Path.home() / ".local" / "share" / "voice_assistant" / "logs"
+            # Use project root logs directory
+            project_root = Path(__file__).parent.parent.parent
+            self.log_dir = project_root / "logs"
         else:
             self.log_dir = log_dir
 

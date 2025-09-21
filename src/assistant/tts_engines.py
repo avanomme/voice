@@ -69,7 +69,7 @@ class CoquiEngine:
         """Lazy load the Coqui model"""
         if self.model is None:
             try:
-                #from TTS.api import TTS
+                from TTS.api import TTS
                 print("Loading Coqui XTTS v2 model...")
                 self.model = TTS(self.model_name).to(self.device)
                 print("Coqui model loaded successfully")
