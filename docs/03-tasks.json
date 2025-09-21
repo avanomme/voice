@@ -61,7 +61,7 @@
       "description": "Verify all engines and voices work in web interface",
       "priority": "high",
       "category": "testing",
-      "status": "todo",
+      "status": "done",
       "assignee": null,
       "estimated_hours": 1,
       "dependencies": [1, 2, 3],

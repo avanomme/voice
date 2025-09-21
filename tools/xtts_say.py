@@ -1,6 +1,5 @@
 # xtts_say.py
 import sys
-import torch
 from torch.serialization import add_safe_globals
 from TTS.tts.configs.xtts_config import XttsConfig
 from TTS.tts.models.xtts import XttsAudioConfig

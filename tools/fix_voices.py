@@ -24,12 +24,11 @@ def test_available_models():
         if 'Available speaker ids:' in result.stdout:
             print("Coqui XTTS v2 speakers available: ~50+ voices")
             print("Includes: Claribel Dervla, Ana Florence, Andrew Chipper, etc.")
-    except:
-        print("Coqui XTTS v2: Not accessible via CLI")
+    except Exception as e:
+        print(f"Coqui XTTS v2: Not accessible via CLI ({e})")
     
     # Test Bark
     try:
-        import bark
         print("Bark models: Available with emotional expressions")
         bark_speakers = ['v2/en_speaker_0', 'v2/en_speaker_1', 'v2/en_speaker_2', 'v2/en_speaker_6']
         print(f"Bark speakers: {bark_speakers}")

@@ -5,9 +5,7 @@ Implements the automated task workflow as specified in next_task.md
 """
 
 import json
-import os
 from pathlib import Path
-from datetime import datetime
 
 def load_tasks():
     """Load tasks from docs/03-tasks.json"""
@@ -43,7 +41,7 @@ def main():
         print("🎉 All current tasks are completed or in progress.")
         return
 
-    print(f"📋 Next Task Found:")
+    print("📋 Next Task Found:")
     print(f"   • ID: {task['id']}")
     print(f"   • Title: {task['title']}")
     print(f"   • Description: {task['description']}")

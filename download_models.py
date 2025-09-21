@@ -4,11 +4,9 @@ Model Pre-downloader for Voice Assistant
 Downloads all TTS models before running the web interface
 """
 
-import os
 import sys
 import urllib.request
 from pathlib import Path
-import subprocess
 
 def print_status(message, color="\033[92m"):
     """Print colored status message"""
@@ -61,7 +59,7 @@ def download_coqui_models():
     
     try:
         # Import TTS and trigger model download
-        #from TTS.api import TTS
+        from TTS.api import TTS
         
         print_status("Loading XTTS v2 (this will download ~1GB on first run)...")
         tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2", progress_bar=True)
@@ -69,7 +67,7 @@ def download_coqui_models():
         
         # Test a quick synthesis to ensure it works
         print_status("Testing Coqui model...")
-        test_wav = tts.tts("Hello, this is a test", language="en")
+        tts.tts("Hello, this is a test", language="en")
         print_status("Coqui model test successful")
         
     except ImportError:
@@ -99,7 +97,7 @@ def download_whisper_models():
     try:
         import whisper
         print_status("Loading Whisper base model...")
-        model = whisper.load_model("base", download_root=Path.home() / ".cache" / "whisper")
+        whisper.load_model("base", download_root=Path.home() / ".cache" / "whisper")
         print_status("Whisper model ready")
         
     except ImportError:

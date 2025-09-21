@@ -55,7 +55,7 @@ def install_package(package: str, extra_args: List[str] = None) -> Tuple[bool, s
             return False, error_msg
             
     except subprocess.TimeoutExpired:
-        error_msg = f"Installation timeout (5 minutes exceeded)"
+        error_msg = "Installation timeout (5 minutes exceeded)"
         print_colored(f"✗ {package} failed: {error_msg}", Colors.RED)
         return False, error_msg
     except Exception as e:
@@ -193,7 +193,7 @@ def main():
     install_package_list(advanced_packages, "Advanced/Development")
     
     # Install Bark separately (requires git)
-    print_colored(f"\n🐕 Installing Bark TTS (from git)...", Colors.BOLD + Colors.BLUE)
+    print_colored("\n🐕 Installing Bark TTS (from git)...", Colors.BOLD + Colors.BLUE)
     print_colored("-" * 50, Colors.BLUE)
     
     bark_success, bark_error = install_package("git+https://github.com/suno-ai/bark.git")
@@ -224,7 +224,7 @@ def main():
     print_colored(f"\n📈 Success Rate: {success_rate:.1f}% ({len(successful_installs)}/{total_packages})", Colors.BOLD + Colors.CYAN)
     
     # Recommendations
-    print_colored(f"\n💡 RECOMMENDATIONS:", Colors.BOLD + Colors.YELLOW)
+    print_colored("\n💡 RECOMMENDATIONS:", Colors.BOLD + Colors.YELLOW)
     
     if any("pyaudio" in pkg for pkg, _ in failed_installs):
         print_colored("  • PyAudio failed - install system audio libraries:", Colors.YELLOW)
@@ -248,7 +248,7 @@ def main():
     else:
         print_colored("  ✅ All essential packages installed - voice assistant should work!", Colors.GREEN)
     
-    print_colored(f"\n🎤 Installation complete! Check the summary above for any issues.", Colors.BOLD + Colors.PURPLE)
+    print_colored("\n🎤 Installation complete! Check the summary above for any issues.", Colors.BOLD + Colors.PURPLE)
     return len(failed_installs) == 0
 
 if __name__ == "__main__":

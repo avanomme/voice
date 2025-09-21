@@ -6,7 +6,6 @@ Centralized error logging with file output and console display
 
 import logging
 import sys
-import os
 from pathlib import Path
 from datetime import datetime
 import traceback
@@ -102,7 +101,7 @@ class VoiceAssistantLogger:
             f.write(f"Timestamp: {datetime.now().isoformat()}\n")
             f.write(f"Context: {context}\n")
             f.write(f"Exception: {str(exception)}\n")
-            f.write(f"Traceback:\n")
+            f.write("Traceback:\n")
             traceback.print_exc(file=f)
             f.write(f"{'='*80}\n")
 

@@ -4,7 +4,6 @@ Bootstrap Command - Voice Assistant Project Setup
 Sets up project structure according to Claude Code workflow standards
 """
 
-import os
 import json
 from pathlib import Path
 

@@ -55,7 +55,8 @@ def get_available_ollama_models():
             models = response.json().get("models", [])
             return [model["name"] for model in models]
         return ["mistral:latest"]  # fallback
-    except:
+    except Exception as e:
+        logging.error(f"Failed to get Ollama models: {e}")
         return ["mistral:latest"]  # fallback
 
 @app.get("/", response_class=HTMLResponse)
@@ -107,58 +108,58 @@ async def get_index():
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Engine Voice Assistant</title>
     <style>
-        body {{
+        body {{{{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             background: #1a1a1a;
             color: #e0e0e0;
-        }}
-        .container {{
+        }}}}
+        .container {{{{
             background: #2d2d2d;
             border-radius: 12px;
             padding: 30px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }}
-        h1 {{
+        }}}}
+        h1 {{{{
             text-align: center;
             color: #4CAF50;
             margin-bottom: 10px;
-        }}
-        .subtitle {{
+        }}}}
+        .subtitle {{{{
             text-align: center;
             color: #888;
             margin-bottom: 30px;
-        }}
-        .engine-grid {{
+        }}}}
+        .engine-grid {{{{
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             margin-bottom: 30px;
-        }}
-        .voice-settings {{
+        }}}}
+        .voice-settings {{{{
             background: #333;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-        }}
-        .voice-settings h3 {{
+        }}}}
+        .voice-settings h3 {{{{
             margin-top: 0;
             color: #4CAF50;
-        }}
-        .engine-info {{
+        }}}}
+        .engine-info {{{{
             background: #2a2a2a;
             padding: 10px;
             border-radius: 4px;
             margin: 5px 0;
             font-size: 14px;
-        }}
-        .controls {{
+        }}}}
+        .controls {{{{
             text-align: center;
             margin: 30px 0;
-        }}
-        button {{
+        }}}}
+        button {{{{
             background: #4CAF50;
             color: white;
             border: none;
@@ -168,26 +169,26 @@ async def get_index():
             cursor: pointer;
             margin: 0 10px;
             transition: all 0.3s;
-        }}
-        button:hover:not(:disabled) {{
+        }}}}
+        button:hover:not(:disabled) {{{{
             background: #45a049;
             transform: translateY(-2px);
-        }}
-        button:disabled {{
+        }}}}
+        button:disabled {{{{
             background: #666;
             cursor: not-allowed;
             transform: none;
-        }}
-        .recording {{
+        }}}}
+        .recording {{{{
             background: #f44336 !important;
             animation: pulse 1s infinite;
-        }}
-        @keyframes pulse {{
+        }}}}
+        @keyframes pulse {{{{
             0% {{ opacity: 1; }}
             50% {{ opacity: 0.7; }}
             100% {{ opacity: 1; }}
-        }}
-        .chat-container {{
+        }}}}
+        .chat-container {{{{
             height: 500px;
             overflow-y: auto;
             border: 1px solid #444;
@@ -195,30 +196,30 @@ async def get_index():
             padding: 15px;
             margin: 20px 0;
             background: #1e1e1e;
-        }}
-        .message {{
+        }}}}
+        .message {{{{
             margin: 15px 0;
             padding: 15px;
             border-radius: 8px;
-        }}
-        .user-message {{
+        }}}}
+        .user-message {{{{
             background: linear-gradient(135deg, #0084ff, #0066cc);
             color: white;
             margin-left: 50px;
-        }}
-        .ai-message {{
+        }}}}
+        .ai-message {{{{
             background: linear-gradient(135deg, #333, #444);
             color: #e0e0e0;
             margin-right: 50px;
-        }}
-        .thinking-section {{
+        }}}}
+        .thinking-section {{{{
             background: #2a2a2a;
             border: 1px solid #555;
             border-radius: 8px;
             margin: 10px 0;
             overflow: hidden;
-        }}
-        .thinking-header {{
+        }}}}
+        .thinking-header {{{{
             background: #3a3a3a;
             padding: 15px;
             cursor: pointer;
@@ -226,11 +227,11 @@ async def get_index():
             justify-content: space-between;
             align-items: center;
             transition: background 0.3s;
-        }}
-        .thinking-header:hover {{
+        }}}}
+        .thinking-header:hover {{{{
             background: #4a4a4a;
-        }}
-        .thinking-content {{
+        }}}}
+        .thinking-content {{{{
             padding: 20px;
             display: none;
             border-top: 1px solid #555;
@@ -239,44 +240,44 @@ async def get_index():
             line-height: 1.6;
             white-space: pre-wrap;
             background: #1e1e1e;
-        }}
-        .thinking-content.expanded {{
+        }}}}
+        .thinking-content.expanded {{{{
             display: block;
-        }}
-        .chevron {{
+        }}}}
+        .chevron {{{{
             transition: transform 0.3s;
             font-size: 18px;
-        }}
-        .chevron.expanded {{
+        }}}}
+        .chevron.expanded {{{{
             transform: rotate(90deg);
-        }}
-        .status {{
+        }}}}
+        .status {{{{
             text-align: center;
             padding: 12px;
             border-radius: 4px;
             margin: 10px 0;
             font-weight: bold;
-        }}
+        }}}}
         .status.info {{ background: #2196F3; color: white; }}
         .status.error {{ background: #f44336; color: white; }}
         .status.success {{ background: #4CAF50; color: white; }}
         .status.warning {{ background: #ff9800; color: white; }}
-        .audio-controls {{
+        .audio-controls {{{{
             margin: 15px 0;
             text-align: center;
-        }}
-        audio {{
+        }}}}
+        audio {{{{
             width: 100%;
             max-width: 500px;
             background: #333;
             border-radius: 4px;
-        }}
-        .input-container {{
+        }}}}
+        .input-container {{{{
             display: flex;
             gap: 10px;
             margin: 20px 0;
-        }}
-        input[type="text"] {{
+        }}}}
+        input[type="text"] {{{{
             flex: 1;
             padding: 15px;
             border: 1px solid #444;
@@ -285,12 +286,12 @@ async def get_index():
             color: #e0e0e0;
             font-size: 16px;
             transition: border-color 0.3s;
-        }}
-        input[type="text"]:focus {{
+        }}}}
+        input[type="text"]:focus {{{{
             outline: none;
             border-color: #4CAF50;
-        }}
-        select {{
+        }}}}
+        select {{{{
             background: #333;
             color: #e0e0e0;
             border: 1px solid #444;
@@ -299,45 +300,51 @@ async def get_index():
             font-size: 14px;
             width: 100%;
             margin: 10px 0;
-        }}
-        optgroup {{
+        }}}}
+        optgroup {{{{
             background: #2a2a2a;
             color: #4CAF50;
             font-weight: bold;
-        }}
-        option {{
+        }}}}
+        option {{{{
             background: #333;
             color: #e0e0e0;
             padding: 8px;
-        }}
-        .voice-test {{
+        }}}}
+        .voice-test {{{{
             margin-left: 10px;
             padding: 10px 20px;
             font-size: 14px;
-        }}
-        .settings-grid {{
+        }}}}
+        .settings-grid {{{{
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             margin-bottom: 20px;
-        }}
-        .clone-section {{
+        }}}}
+        .clone-section {{{{
             background: #2a2a2a;
             padding: 15px;
             border-radius: 8px;
             margin: 10px 0;
-        }}
-        .file-input {{
+        }}}}
+        .file-input {{{{
             margin: 10px 0;
-        }}
-        .recommended-badge {{
+        }}}}
+        .recommended-badge {{{{
             background: #ff9800;
             color: white;
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 11px;
             margin-left: 5px;
-        }}
+        }}}}
+        .mic-enable-btn {{{{
+            background: #2196F3; /* Blue */
+        }}}}
+        .mic-enable-btn:hover:not(:disabled) {{{{
+            background: #1e88e5;
+        }}}}
     </style>
 </head>
 <body>
@@ -388,6 +395,7 @@ async def get_index():
         </div>
         
         <div class="controls">
+            <button id="enableMicBtn" onclick="enableMicrophone()" class="mic-enable-btn">🔓 Enable Microphone</button>
             <button id="recordBtn" onclick="toggleRecording()">🎤 Start Recording</button>
             <button id="wakeWordBtn" onclick="toggleWakeWord()">🎧 Start Wake Word</button>
             <button onclick="clearChat()">🗑️ Clear Chat</button>
@@ -404,22 +412,22 @@ async def get_index():
         let audioChunks = [];
         let wakeWordActive = false;
         
-        function showStatus(message, type = 'info') {{
+        function showStatus(message, type = 'info') {{{{
             const status = document.getElementById('status');
             status.innerHTML = `<div class="status ${{type}}">${{message}}</div>`;
             setTimeout(() => status.innerHTML = '', 5000);
-        }}
+        }}}}
         
-        function addMessage(content, isUser = false) {{
+        function addMessage(content, isUser = false) {{{{
             const chatContainer = document.getElementById('chatContainer');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${{isUser ? 'user-message' : 'ai-message'}}`;
             messageDiv.innerHTML = content;
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
-        }}
+        }}}}
         
-        function addThinkingSection(thinking, response, engine, voice) {{
+        function addThinkingSection(thinking, response, engine, voice) {{{{
             const chatContainer = document.getElementById('chatContainer');
             
             // Create thinking section
@@ -439,69 +447,79 @@ async def get_index():
             addMessage(`🤖 ${{response}}`);
             
             chatContainer.scrollTop = chatContainer.scrollHeight;
-        }}
+        }}}}
         
-        function toggleThinking(header) {{
+        function toggleThinking(header) {{{{
             const content = header.nextElementSibling;
             const chevron = header.querySelector('.chevron');
             
             content.classList.toggle('expanded');
             chevron.classList.toggle('expanded');
-        }}
+        }}}}
 
-        async function checkMicrophonePermission() {
-            try {
-                const result = await navigator.permissions.query({ name: 'microphone' });
+        async function checkMicrophonePermission() {{{{
+            try {{{{
+                const result = await navigator.permissions.query({{ name: 'microphone' }});
                 return result.state; // 'granted', 'prompt', or 'denied'
-            } catch (error) {
+            }}}} catch (error) {{{{
                 console.error("Permission API not supported, assuming prompt is needed.", error);
                 return 'prompt'; // Fallback for older browsers
-            }
-        }
+            }}}}
+        }}}}
 
-        async function requestMicrophoneAccess() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        async function requestMicrophoneAccess() {{{{
+            try {{{{
+                const stream = await navigator.mediaDevices.getUserMedia({{ audio: true }});
                 // Immediately stop the stream; we only wanted the permission prompt.
                 stream.getTracks().forEach(track => track.stop());
                 return true;
-            } catch (error) {
+            }}}} catch (error) {{{{
                 console.error("Error requesting microphone access:", error);
                 return false;
-            }
-        }
+            }}}}
+        }}}}
 
-        async function toggleRecording() {
+        async function enableMicrophone() {{{{
+            showStatus('🎤 Requesting microphone permission...', 'info');
+            const granted = await requestMicrophoneAccess();
+            if (granted) {{{{
+                showStatus('✅ Microphone permission granted!', 'success');
+            }}}} else {{{{
+                showStatus('❌ Microphone permission denied.', 'error');
+            }}}}
+        }}}}
+
+        async function toggleRecording() {{{{
             const recordBtn = document.getElementById('recordBtn');
             
-            if (!isRecording) {
+            if (!isRecording) {{{{
                 const permStatus = await checkMicrophonePermission();
-                if (permStatus === 'denied') {
+                if (permStatus === 'denied') {{{{
                     showStatus('❌ Microphone access is blocked. Please enable it in your browser settings.', 'error');
                     return;
-                }
-                if (permStatus === 'prompt') {
+                }}}}
+                if (permStatus === 'prompt') {{{{
                     const granted = await requestMicrophoneAccess();
-                    if (!granted) {
+                    if (!granted) {{{{
                         showStatus('❌ Microphone access denied.', 'error');
                         return;
-                    }
-                }
+                    }}}}
+                }}}}
 
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                try {{{{
+                    const stream = await navigator.mediaDevices.getUserMedia({{ audio: true }});
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
                     
-                    mediaRecorder.ondataavailable = event => {
+                    mediaRecorder.ondataavailable = event => {{{{
                         audioChunks.push(event.data);
-                    };
+                    }}}};
                     
-                    mediaRecorder.onstop = async () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    mediaRecorder.onstop = async () => {{{{
+                        const audioBlob = new Blob(audioChunks, {{ type: 'audio/wav' }});
                         await processAudio(audioBlob);
                         stream.getTracks().forEach(track => track.stop());
-                    };
+                    }}}};
                     
                     mediaRecorder.start();
                     isRecording = true;
@@ -509,112 +527,112 @@ async def get_index():
                     recordBtn.className = 'recording';
                     showStatus('🎤 Recording... Speak now!', 'info');
                     
-                } catch (error) {
+                }}}} catch (error) {{{{
                     showStatus('❌ Could not start recording. Is a microphone connected?', 'error');
-                }
-            } else {
-                if (mediaRecorder) {
+                }}}}
+            }}}} else {{{{
+                if (mediaRecorder) {{{{
                     mediaRecorder.stop();
-                }
+                }}}}
                 isRecording = false;
                 recordBtn.innerHTML = '🎤 Start Recording';
                 recordBtn.className = '';
                 showStatus('🔄 Processing audio...', 'info');
-            }
-        }
+            }}}}
+        }}}}
         
-        async function processAudio(audioBlob) {{
-            try {{
+        async function processAudio(audioBlob) {{{{
+            try {{{{
                 const formData = new FormData();
                 formData.append('audio', audioBlob, 'recording.wav');
                 
                 showStatus('🎯 Transcribing speech...', 'info');
-                const response = await fetch('/transcribe', {{
+                const response = await fetch('/transcribe', {{{{
                     method: 'POST',
                     body: formData
-                }});
+                }}}});
                 
                 const result = await response.json();
                 
-                if (result.error) {{
+                if (result.error) {{{{
                     showStatus(`❌ Transcription error: ${{result.error}}`, 'error');
                     return;
-                }}
+                }}}}
                 
                 const transcription = result.transcription;
-                if (transcription && transcription.length > 2) {{
+                if (transcription && transcription.length > 2) {{{{
                     addMessage(`🗣️ ${{transcription}}`, true);
                     await getAIResponse(transcription);
-                }} else {{
+                }}}} else {{{{
                     showStatus('❌ No clear speech detected - try again', 'warning');
-                }}
+                }}}}
                 
-            }} catch (error) {{
+            }}}} catch (error) {{{{
                 showStatus(`❌ Audio processing error: ${{error.message}}`, 'error');
-            }}
-        }}
+            }}}}
+        }}}}
 
-        async function toggleWakeWord() {{
+        async function toggleWakeWord() {{{{
             const wakeBtn = document.getElementById('wakeWordBtn');
 
-            if (!wakeWordActive) {
+            if (!wakeWordActive) {{{{
                 const permStatus = await checkMicrophonePermission();
-                if (permStatus === 'denied') {
+                if (permStatus === 'denied') {{{{
                     showStatus('❌ Microphone access is blocked. Please enable it in your browser settings.', 'error');
                     return;
-                }
-                if (permStatus === 'prompt') {
+                }}}}
+                if (permStatus === 'prompt') {{{{
                     const granted = await requestMicrophoneAccess();
-                    if (!granted) {
+                    if (!granted) {{{{
                         showStatus('❌ Microphone access denied.', 'error');
                         return;
-                    }
-                }
+                    }}}}
+                }}}}
 
-                try {{
+                try {{{{
                     const response = await fetch('/wake-word/start', {{ method: 'POST' }});
                     const result = await response.json();
-                    if (result.success) {{
+                    if (result.success) {{{{
                         wakeWordActive = true;
                         wakeBtn.innerHTML = '🛑 Stop Wake Word';
                         showStatus('🎧 Wake word detection active - say "Hey Assistant"', 'success');
-                    }} else {{
+                    }}}} else {{{{
                         showStatus(`❌ Failed to start wake word: ${{result.error}}`, 'error');
-                    }}
-                }} catch (error) {{
+                    }}}}
+                }}}} catch (error) {{{{
                     showStatus('❌ Failed to start wake word detection', 'error');
-                }}
-            }} else {{
-                try {{
+                }}}}
+            }}}} else {{{{
+                try {{{{
                     const response = await fetch('/wake-word/stop', {{ method: 'POST' }});
                     const result = await response.json();
-                    if (result.success) {{
+                    if (result.success) {{{{
                         wakeWordActive = false;
                         wakeBtn.innerHTML = '🎧 Start Wake Word';
                         showStatus('🛑 Wake word detection stopped', 'info');
-                    }}
-                }} catch (error) {{
+                    }}}}
+                }}}} catch (error) {{{{
                     showStatus('❌ Failed to stop wake word detection', 'error');
-                }}
-            }}
-        }}
+                }}}}
+            }}}}
+        }}}}
 
-        async function sendText() {{
+        async function sendText() {{{{
             const textInput = document.getElementById('textInput');
             const text = textInput.value.trim();
             
-            if (!text) {{
+            if (!text) {{{{
                 showStatus('❌ Please enter some text', 'warning');
                 return;
-            }}
+            }}}}
             
             addMessage(`💬 ${{text}}`, true);
             textInput.value = '';
             await getAIResponse(text);
-        }}
+        }}}}
         
-        async function getAIResponse(text) {{
-            try {{
+        async function getAIResponse(text) {{{{
+            try {{{{
                 showStatus('🤔 AI is thinking...', 'info');
                 
                 const voiceSelect = document.getElementById('voiceSelect');
@@ -625,27 +643,27 @@ async def get_index():
 
                 const formData = new FormData();
                 formData.append('message', text);
-                if (selectedVoice) {{
+                if (selectedVoice) {{{{
                     formData.append('voice', selectedVoice);
-                }}
-                if (selectedModel) {{
+                }}}}
+                if (selectedModel) {{{{
                     formData.append('model', selectedModel);
-                }}
-                if (cloneFile) {{
+                }}}}
+                if (cloneFile) {{{{
                     formData.append('clone_audio', cloneFile);
-                }}
+                }}}}
                 
-                const response = await fetch('/chat', {{
+                const response = await fetch('/chat', {{{{
                     method: 'POST',
                     body: formData
-                }});
+                }}}});
                 
                 const result = await response.json();
                 
-                if (result.error) {{
+                if (result.error) {{{{
                     showStatus(`❌ AI Error: ${{result.error}}`, 'error');
                     return;
-                }}
+                }}}}
                 
                 // Add thinking section and response
                 const engineInfo = selectedVoice ? selectedVoice.split(':')[0] : 'default';
@@ -654,29 +672,29 @@ async def get_index():
                 addThinkingSection(result.thinking, result.response, engineInfo, voiceInfo);
                 
                 // Generate and play speech
-                if (result.audio) {{
+                if (result.audio) {{{{
                     const audioDiv = document.createElement('div');
                     audioDiv.className = 'audio-controls';
                     audioDiv.innerHTML = `<audio controls autoplay><source src="data:audio/wav;base64,${{result.audio}}" type="audio/wav"></audio>`;
                     document.getElementById('chatContainer').appendChild(audioDiv);
                     document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
-                }}
+                }}}}
                 
                 showStatus('✅ Response complete!', 'success');
                 
-            }} catch (error) {{
+            }}}} catch (error) {{{{
                 showStatus(`❌ Request failed: ${{error.message}}`, 'error');
-            }}
-        }}
+            }}}}
+        }}}}
         
-        async function testVoice() {{
+        async function testVoice() {{{{
             const voiceSelect = document.getElementById('voiceSelect');
             const selectedVoice = voiceSelect.value;
             
-            if (!selectedVoice) {{
+            if (!selectedVoice) {{{{
                 showStatus('❌ Please select a voice first', 'warning');
                 return;
-            }}
+            }}}}
             
             const testTexts = [
                 "Hello there! This is a test of the selected voice.",
@@ -686,42 +704,42 @@ async def get_index():
             
             const testText = testTexts[Math.floor(Math.random() * testTexts.length)];
             
-            try {{
+            try {{{{
                 showStatus('🔊 Testing voice...', 'info');
                 
-                const response = await fetch('/test-voice', {{
+                const response = await fetch('/test-voice', {{{{
                     method: 'POST',
-                    headers: {{
+                    headers: {{{{
                         'Content-Type': 'application/json',
-                    }},
+                    }}}},
                     body: JSON.stringify({{ 
                         text: testText,
                         voice: selectedVoice
                     }})
-                }});
+                }}}});
                 
                 const result = await response.json();
                 
-                if (result.audio) {{
+                if (result.audio) {{{{
                     const audio = new Audio(`data:audio/wav;base64,${{result.audio}}`);
                     audio.play();
                     showStatus('✅ Voice test complete!', 'success');
-                }} else {{
+                }}}} else {{{{
                     showStatus('❌ Voice test failed', 'error');
-                }}
+                }}}}
                 
-            }} catch (error) {{
+            }}}} catch (error) {{{{
                 showStatus(`❌ Voice test error: ${{error.message}}`, 'error');
-            }}
-        }}
+            }}}}
+        }}}}
         
-        function clearChat() {{
+        function clearChat() {{{{
             document.getElementById('chatContainer').innerHTML = '';
             showStatus('🗑️ Chat cleared', 'success');
-        }}
+        }}}}
         
-        async function showStats() {{
-            try {{
+        async function showStats() {{{{
+            try {{{{
                 const response = await fetch('/stats');
                 const stats = await response.json();
                 
@@ -735,30 +753,30 @@ async def get_index():
                 
                 addMessage(statsMessage.trim());
                 
-            }} catch (error) {{
+            }}}} catch (error) {{{{
                 showStatus('❌ Could not load statistics', 'error');
-            }}
-        }}
+            }}}}
+        }}}}
         
         // Enter key support for text input
-        document.getElementById('textInput').addEventListener('keypress', function(e) {{
-            if (e.key === 'Enter') {{
+        document.getElementById('textInput').addEventListener('keypress', function(e) {{{{
+            if (e.key === 'Enter') {{{{
                 sendText();
-            }}
-        }});
+            }}}}
+        }}}});
         
         // Initial message
         addMessage('🤖 Multi-engine voice assistant ready! Select a voice, then try recording audio or typing messages. Use voice cloning for personalized speech synthesis.');
 
         // Check microphone permission on load
-        window.addEventListener('load', async () => {
+        window.addEventListener('load', async () => {{{{
             const permStatus = await checkMicrophonePermission();
-            if (permStatus === 'prompt') {
+            if (permStatus === 'prompt') {{{{
                 showStatus('🎤 Microphone access is required for voice input. Click the record or wake word button to grant permission.', 'info');
-            } else if (permStatus === 'denied') {
+            }}}} else if (permStatus === 'denied') {{{{
                 showStatus('❌ Microphone access is blocked. Please enable it in your browser settings to use voice input.', 'warning');
-            }
-        });
+            }}}}
+        }}}});
     </script>
 </body>
 </html>

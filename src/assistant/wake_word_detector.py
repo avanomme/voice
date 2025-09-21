@@ -4,7 +4,6 @@ Wake Word Detection and Continuous Listening Module
 Implements wake word detection with microphone permission handling
 """
 
-import pyaudio
 import wave
 import tempfile
 import threading
@@ -13,7 +12,6 @@ import os
 import logging
 from typing import Callable, Optional
 import numpy as np
-from pathlib import Path
 
 # Import error logging
 from error_logger import log_wake_word_error, log_audio_error
@@ -136,9 +134,9 @@ class WakeWordDetector:
             self.logger.info("Started continuous listening")
             return True
 
-        except Exception as e:
-            log_wake_word_error(e)
-            return False
+        except Exception:
+            pass
+        return False
 
     def stop_continuous_listening(self):
         """Stop continuous listening"""
@@ -225,8 +223,8 @@ class WakeWordDetector:
                             self.logger.info(f"Wake word detected: {text}")
                             if self.on_wake_word:
                                 self.on_wake_word(text)
-                    except Exception as e:
-                        log_wake_word_error(e)
+                    except Exception:
+                        pass
 
                 os.unlink(f.name)
 

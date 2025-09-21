@@ -9,15 +9,12 @@ import tempfile
 import subprocess
 import base64
 import torch
-import numpy as np
-from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional
 import urllib.request
-import json
 
 from voice_models import (
-    TTS_ENGINES, MODELS_DIR, COQUI_DIR, BARK_DIR, PIPER_DIR,
-    VCTK_BRITISH_VOICES, BARK_SPEAKERS, PIPER_MODELS
+    XTTS_SPEAKERS, MODELS_DIR, COQUI_DIR, BARK_DIR, PIPER_DIR,
+    BARK_SPEAKERS, PIPER_MODELS
 )
 
 class TTSEngineManager:
@@ -64,6 +61,7 @@ class CoquiEngine:
         self.device = device
         self.model = None
         self.model_name = "tts_models/multilingual/multi-dataset/xtts_v2"
+        os.environ["COQUI_TOS_AGREED"] = "1"
         
     def _load_model(self):
         """Lazy load the Coqui model"""
@@ -96,8 +94,8 @@ class CoquiEngine:
                     language=language,
                     split_sentences=True
                 )
-            elif voice_id and voice_id in VCTK_BRITISH_VOICES:
-                # Use VCTK speaker
+            elif voice_id and voice_id in XTTS_SPEAKERS:
+                # Use XTTS built-in speaker
                 self.model.tts_to_file(
                     text=text,
                     file_path=output_path,
@@ -105,7 +103,7 @@ class CoquiEngine:
                     language=language
                 )
             else:
-                # Default synthesis
+                # Default synthesis if no valid voice_id or clone_voice_path is provided
                 self.model.tts_to_file(
                     text=text,
                     file_path=output_path,
@@ -132,7 +130,6 @@ class BarkEngine:
         if self.model is None:
             try:
                 from bark import SAMPLE_RATE, generate_audio, preload_models
-                from bark.generation import SUPPORTED_LANGS
                 print("Loading Bark model...")
                 preload_models()
                 self.generate_audio = generate_audio

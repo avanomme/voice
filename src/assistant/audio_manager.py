@@ -111,20 +111,18 @@ class AudioManager:
                 # Play the audio
                 if Path('/tmp/test_audio.wav').exists():
                     subprocess.run(['aplay', '/tmp/test_audio.wav'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                    os.unlink('/tmp/test_audio.wav')
-                    return True
-        except:
-            pass
+        except Exception as e:
+            log_audio_error("piper TTS", e)
         return False
 
     def _try_espeak_tts(self, text: str) -> bool:
         """Try espeak TTS if available"""
-        try:
-            if shutil.which('espeak'):
+        if shutil.which('espeak'):
+            try:
                 subprocess.run(['espeak', text], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 return True
-        except:
-            pass
+            except Exception as e:
+                log_audio_error("espeak TTS", e)
         return False
 
     def _try_festival_tts(self, text: str) -> bool:
@@ -135,8 +133,8 @@ class AudioManager:
                 process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 process.communicate(input=text.encode())
                 return True
-        except:
-            pass
+        except Exception as e:
+            log_audio_error("festival TTS", e)
         return False
 
     def get_available_devices(self) -> List[dict]:
@@ -156,7 +154,8 @@ class AudioManager:
                             'channels': device_info['maxInputChannels'],
                             'sample_rate': device_info['defaultSampleRate']
                         })
-                except:
+                except Exception as e:
+                    log_audio_error(f"device info for index {i}", e)
                     continue
 
         except Exception as e:

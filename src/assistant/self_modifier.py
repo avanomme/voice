@@ -4,9 +4,7 @@ Self-Modification System for Voice Assistant
 Allows the AI to safely modify its own program files with user permission
 """
 
-import os
 import shutil
-import subprocess
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 import logging

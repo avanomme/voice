@@ -10,8 +10,7 @@ import json
 import os
 import tempfile
 import uuid
-from datetime import datetime
-from typing import Tuple, Dict, Any, Optional
+from typing import Tuple, Dict, Any
 
 from memory_manager import get_memory_manager
 from self_modifier import get_self_modifier

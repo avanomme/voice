@@ -7,7 +7,6 @@ Prevents std::bad_alloc errors by controlling memory allocation
 import os
 import torch
 import gc
-from pathlib import Path
 
 def setup_gpu_memory():
     """Configure GPU memory settings to prevent allocation errors"""
@@ -34,7 +33,7 @@ def safe_load_coqui():
         print("Attempting to load Coqui XTTS v2...")
         setup_gpu_memory()
         
-        #from TTS.api import TTS
+        from TTS.api import TTS
         
         # Force CPU loading first to avoid GPU memory issues
         print("Loading on CPU first...")
@@ -98,7 +97,7 @@ def download_models_safely():
         try:
             # Test synthesis
             print("Testing Coqui synthesis...")
-            test_audio = coqui_model.tts("Hello, this is a test", language="en")
+            coqui_model.tts("Hello, this is a test", language="en")
             print("Coqui test successful")
         except Exception as e:
             print(f"Coqui test failed: {e}")
@@ -112,7 +111,7 @@ def download_models_safely():
     bark_success = safe_load_bark()
     
     print("\nModel loading summary:")
-    print(f"Whisper: OK")
+    print("Whisper: OK")
     print(f"Coqui: {'OK' if coqui_model else 'FAILED'}")
     print(f"Bark: {'OK' if bark_success else 'FAILED'}")
 

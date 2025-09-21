@@ -5,9 +5,7 @@ Implements the automated task workflow as specified in next_task.md
 """
 
 import json
-import os
 from pathlib import Path
-from datetime import datetime
 
 def load_tasks():
     """Load tasks from docs/03-tasks.json"""
@@ -43,7 +41,7 @@ def main():
         print("🎉 All current tasks are completed or in progress.")
         return
 
-    print(f"📋 Next Task Found:")
+    print("📋 Next Task Found:")
     print(f"   • ID: {task['id']}")
     print(f"   • Title: {task['title']}")
     print(f"   • Description: {task['description']}")
@@ -61,8 +59,9 @@ def main():
     print("3. Mark task status as 'done' in docs/03-tasks.json")
     print("4. Append completion entry to docs/02-decisions.md")
     print("5. Regenerate CONTEXT.md (≤200 lines)")
-    print("6. Output JSON confirmation block")
-    print("7. Create commit message and git push")
+    print("6. Run /check to inspect and fix any errors in .vscode/problems.json")
+    print("7. Output JSON confirmation block")
+    print("8. Create commit message and git push")
     print()
 
     print("🚀 Implementation guidance:")

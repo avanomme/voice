@@ -9,7 +9,7 @@ def download_whisper_model():
     print("Downloading Whisper model...")
     try:
         import whisper
-        model = whisper.load_model("base")
+        whisper.load_model("base")
         print("✅ Whisper model ready")
         return True
     except Exception as e:
@@ -25,7 +25,7 @@ def download_coqui_model():
         
         # Test synthesis
         print("Testing Coqui synthesis...")
-        wav = tts.tts("Hello, this is a test.", language="en")
+        tts.tts("Hello, this is a test.", language="en")
         print("✅ Coqui XTTS v2 ready")
         return True
     except Exception as e:
@@ -41,7 +41,7 @@ def download_bark_model():
         
         # Test synthesis
         print("Testing Bark synthesis...")
-        audio = generate_audio("Hello from Bark", history_prompt="v2/en_speaker_2")
+        generate_audio("Hello from Bark", history_prompt="v2/en_speaker_2")
         print("✅ Bark models ready")
         return True
     except Exception as e:
