@@ -1,0 +1,19 @@
+description = "Show current project progress and remaining tasks."
+prompt = """
+Read docs/03-tasks.json and:
+1. Count tasks by status (todo, in-progress, done)
+2. Calculate completion percentage
+3. List remaining todo tasks with priorities
+4. Identify any blocked or overdue tasks
+
+Return output in format:
+Project Status:
+- Total Tasks: X
+- Completed: Y (Z%)
+- In Progress: A
+- Todo: B
+
+Remaining Tasks:
+1. [High] Task Title (ID: X)
+...
+"""

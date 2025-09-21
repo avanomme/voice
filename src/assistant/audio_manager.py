@@ -19,7 +19,7 @@ class AudioManager:
         self.logger = logging.getLogger(__name__)
         self.audio = None
         self.preferred_device = None
-        self.sample_rate = 16000
+        self.sample_rate = 44100  # Use standard sample rate
         self.channels = 1
         self.format = pyaudio.paInt16
 

@@ -1,0 +1,1 @@
+Role: Improve CLI/Web UI styling and prompts. No logic changes. Return patch diffs only.

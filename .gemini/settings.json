@@ -1,0 +1,95 @@
+{
+  "house_rules": [
+    "Return unified PATCH DIFF only for code changes",
+    "Limit patches to ≤3 files or ≤50 lines per change",
+    "Split large patches into smaller, focused changes",
+    "Preserve existing code style and patterns",
+    "No comments in code unless explicitly requested",
+    "Test critical paths after changes",
+    "Always test voice/audio functionality after TTS changes",
+    "Maintain error logging for all voice assistant operations",
+    "Keep wake word detection responsive and efficient",
+    "Preserve British/Irish/Australian voice model priorities"
+  ],
+  "tools": {
+    "filesystem": {
+      "enabled": true,
+      "write_access": true,
+      "read_access": true
+    },
+    "search": {
+      "enabled": true,
+      "engines": ["grep", "ripgrep", "find"]
+    },
+    "execution": {
+      "enabled": true,
+      "bash_access": true,
+      "python_access": true
+    }
+  },
+  "excludes": {
+    "directories": [
+      "__pycache__",
+      ".git",
+      "node_modules",
+      ".uv-cache",
+      "*.egg-info",
+      ".pytest_cache",
+      ".mypy_cache"
+    ],
+    "files": [
+      "*.pyc",
+      "*.pyo",
+      "*.pyd",
+      ".DS_Store",
+      "*.log",
+      "*.tmp",
+      "*.swp",
+      "*.bak"
+    ],
+    "patterns": [
+      ".*/.local/share/voice_models/*",
+      "*/site-packages/*",
+      "*/lib/python*/dist-packages/*"
+    ]
+  },
+  "voice_assistant": {
+    "model_directories": [
+      "~/.local/share/voice_models/coqui",
+      "~/.local/share/voice_models/bark",
+      "~/.local/share/voice_models/piper"
+    ],
+    "priority_engines": ["piper", "coqui", "bark"],
+    "default_voice": "en_GB-southern_english_female-low",
+    "gpu_memory_limit": "14GB"
+  },
+  "development": {
+    "auto_reload": true,
+    "debug_mode": false,
+    "log_level": "INFO",
+    "performance_monitoring": true
+  },
+  "testing": {
+    "run_lint_command": "ruff check src/",
+    "run_test_command": "python -m pytest tests/ -v",
+    "voice_test_command": "python src/assistant/web_voice_assistant.py --test-voice",
+    "quick_test_urls": [
+      "http://localhost:8765/health",
+      "http://localhost:8765/wake-word/status"
+    ]
+  },
+  "project_metadata": {
+    "name": "Voice Assistant",
+    "description": "Multi-engine TTS voice assistant with wake word detection",
+    "version": "1.0.0",
+    "main_engines": ["coqui", "bark", "piper"],
+    "features": ["wake_word", "voice_cloning", "multi_accent", "error_logging"],
+    "last_bootstrap": "2025-09-21"
+  },
+  "commands": {
+    "bootstrap": "python .gemini/commands/bootstrap.py",
+    "next_task": "python .gemini/commands/next_task.py",
+    "lint_and_test": "bash .gemini/commands/lint_and_test.sh",
+    "test_voice": "bash .gemini/commands/test_voice.sh"
+  }
+}

@@ -1,0 +1,12 @@
+description = "Initialize a new project with standardized directory structure, docs, agents, and slash commands."
+prompt = """
+You are the project bootstrapper. Follow these actions:
+1. Create `docs/` directory with scope, decisions, and tasks documentation.
+2. Generate `CONTEXT.md` with technical overview (≤200 lines).
+3. Set up `agents/` folder with specialized agent definitions.
+4. Configure `.claude/settings.json` with house rules and tool permissions.
+5. Create `.claude/commands/` with workflow slash commands.
+6. Reorganize files into standard structure if needed.
+
+Return a plan and file tree. Do not execute shell commands directly.
+"""

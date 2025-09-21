@@ -28,7 +28,7 @@ except ImportError:
 
 class WakeWordDetector:
     def __init__(self, wake_words=["hey assistant", "voice assistant"],
-                 sample_rate=16000, chunk_duration=30):
+                 sample_rate=44100, chunk_duration=30):
         """
         Initialize wake word detector
 

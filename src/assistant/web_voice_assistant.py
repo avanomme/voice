@@ -28,7 +28,7 @@ tts_manager = TTSEngineManager()
 conversation_manager = ConversationManager()
 
 # Wake word detector setup
-wake_detector = WakeWordDetector(wake_words=["hey assistant", "voice assistant"])
+wake_detector = WakeWordDetector(wake_words=["pippa", "pips", "hey pippa", "hey pips"])
 
 def on_wake_word_detected(text):
     """Callback for when wake word is detected"""
@@ -75,8 +75,18 @@ async def get_index():
                 for voice in voices:
                     engine_label = f"({voice['engine'].title()})"
                     recommended_star = " ⭐" if voice['id'] in recommended.values() else ""
-                    voice_options += f'<option value="{voice["engine"]}:{voice["id"]}">{voice["name"]} {engine_label}{recommended_star}</option>'
+                    # Set Vale as default selected (Vale is the Deep British Female voice)
+                    selected = ' selected' if 'Vale' in voice['name'] or 'southern_english_female_low' in voice['id'] else ''
+                    voice_options += f'<option value="{voice["engine"]}:{voice["id"]}"{selected}>{voice["name"]} {engine_label}{recommended_star}</option>'
                 voice_options += '</optgroup>'
+
+        # Get available Ollama models and build selection
+        ollama_models = get_available_ollama_models()
+        model_options = ""
+        for model in ollama_models:
+            # Set mistral as default selected
+            selected = ' selected' if 'mistral' in model.lower() else ''
+            model_options += f'<option value="{model}"{selected}>{model}</option>'
 
         # Build engine info for UI
         engine_info = ""
@@ -86,6 +96,7 @@ async def get_index():
     except Exception as e:
         log_web_interface_error("index page generation", e)
         voice_options = "<option value=''>Error loading voices</option>"
+        model_options = "<option value='mistral:latest'>mistral:latest</option>"
         engine_info = "<div class='engine-info'>Error loading engine information</div>"
     
     return HTMLResponse(content=f"""
@@ -351,6 +362,18 @@ async def get_index():
             </div>
             
             <div class="voice-settings">
+                <h3>🤖 AI Model Selection</h3>
+                <select id="modelSelect">
+                    {model_options}
+                </select>
+                <div style="margin-top: 10px; font-size: 12px; color: #888;">
+                    Select which Ollama model to use for AI responses
+                </div>
+            </div>
+        </div>
+
+        <div class="engine-grid">
+            <div class="voice-settings">
                 <h3>⚙️ Engine Information</h3>
                 {engine_info}
                 <div style="margin-top: 15px; font-size: 12px; color: #888;">
@@ -425,25 +448,60 @@ async def get_index():
             content.classList.toggle('expanded');
             chevron.classList.toggle('expanded');
         }}
-        
-        async function toggleRecording() {{
+
+        async function checkMicrophonePermission() {
+            try {
+                const result = await navigator.permissions.query({ name: 'microphone' });
+                return result.state; // 'granted', 'prompt', or 'denied'
+            } catch (error) {
+                console.error("Permission API not supported, assuming prompt is needed.", error);
+                return 'prompt'; // Fallback for older browsers
+            }
+        }
+
+        async function requestMicrophoneAccess() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // Immediately stop the stream; we only wanted the permission prompt.
+                stream.getTracks().forEach(track => track.stop());
+                return true;
+            } catch (error) {
+                console.error("Error requesting microphone access:", error);
+                return false;
+            }
+        }
+
+        async function toggleRecording() {
             const recordBtn = document.getElementById('recordBtn');
             
-            if (!isRecording) {{
-                try {{
-                    const stream = await navigator.mediaDevices.getUserMedia({{ audio: true }});
+            if (!isRecording) {
+                const permStatus = await checkMicrophonePermission();
+                if (permStatus === 'denied') {
+                    showStatus('❌ Microphone access is blocked. Please enable it in your browser settings.', 'error');
+                    return;
+                }
+                if (permStatus === 'prompt') {
+                    const granted = await requestMicrophoneAccess();
+                    if (!granted) {
+                        showStatus('❌ Microphone access denied.', 'error');
+                        return;
+                    }
+                }
+
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
                     
-                    mediaRecorder.ondataavailable = event => {{
+                    mediaRecorder.ondataavailable = event => {
                         audioChunks.push(event.data);
-                    }};
+                    };
                     
-                    mediaRecorder.onstop = async () => {{
-                        const audioBlob = new Blob(audioChunks, {{ type: 'audio/wav' }});
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                         await processAudio(audioBlob);
                         stream.getTracks().forEach(track => track.stop());
-                    }};
+                    };
                     
                     mediaRecorder.start();
                     isRecording = true;
@@ -451,17 +509,19 @@ async def get_index():
                     recordBtn.className = 'recording';
                     showStatus('🎤 Recording... Speak now!', 'info');
                     
-                }} catch (error) {{
-                    showStatus('❌ Microphone access denied or not available', 'error');
-                }}
-            }} else {{
-                mediaRecorder.stop();
+                } catch (error) {
+                    showStatus('❌ Could not start recording. Is a microphone connected?', 'error');
+                }
+            } else {
+                if (mediaRecorder) {
+                    mediaRecorder.stop();
+                }
                 isRecording = false;
                 recordBtn.innerHTML = '🎤 Start Recording';
                 recordBtn.className = '';
                 showStatus('🔄 Processing audio...', 'info');
-            }}
-        }}
+            }
+        }
         
         async function processAudio(audioBlob) {{
             try {{
@@ -497,7 +557,20 @@ async def get_index():
         async function toggleWakeWord() {{
             const wakeBtn = document.getElementById('wakeWordBtn');
 
-            if (!wakeWordActive) {{
+            if (!wakeWordActive) {
+                const permStatus = await checkMicrophonePermission();
+                if (permStatus === 'denied') {
+                    showStatus('❌ Microphone access is blocked. Please enable it in your browser settings.', 'error');
+                    return;
+                }
+                if (permStatus === 'prompt') {
+                    const granted = await requestMicrophoneAccess();
+                    if (!granted) {
+                        showStatus('❌ Microphone access denied.', 'error');
+                        return;
+                    }
+                }
+
                 try {{
                     const response = await fetch('/wake-word/start', {{ method: 'POST' }});
                     const result = await response.json();
@@ -546,12 +619,17 @@ async def get_index():
                 
                 const voiceSelect = document.getElementById('voiceSelect');
                 const selectedVoice = voiceSelect.value;
+                const modelSelect = document.getElementById('modelSelect');
+                const selectedModel = modelSelect.value;
                 const cloneFile = document.getElementById('cloneFile').files[0];
-                
+
                 const formData = new FormData();
                 formData.append('message', text);
                 if (selectedVoice) {{
                     formData.append('voice', selectedVoice);
+                }}
+                if (selectedModel) {{
+                    formData.append('model', selectedModel);
                 }}
                 if (cloneFile) {{
                     formData.append('clone_audio', cloneFile);
@@ -671,6 +749,16 @@ async def get_index():
         
         // Initial message
         addMessage('🤖 Multi-engine voice assistant ready! Select a voice, then try recording audio or typing messages. Use voice cloning for personalized speech synthesis.');
+
+        // Check microphone permission on load
+        window.addEventListener('load', async () => {
+            const permStatus = await checkMicrophonePermission();
+            if (permStatus === 'prompt') {
+                showStatus('🎤 Microphone access is required for voice input. Click the record or wake word button to grant permission.', 'info');
+            } else if (permStatus === 'denied') {
+                showStatus('❌ Microphone access is blocked. Please enable it in your browser settings to use voice input.', 'warning');
+            }
+        });
     </script>
 </body>
 </html>
@@ -689,21 +777,24 @@ async def transcribe_audio(audio: UploadFile = File(...)):
         return {"error": str(e)}
 
 @app.post("/chat")
-async def chat(message: str = Form(...), voice: str = Form(None), clone_audio: UploadFile = File(None)):
+async def chat(message: str = Form(...), voice: str = Form(None), model: str = Form(None), clone_audio: UploadFile = File(None)):
     """Get AI response with thinking and generate speech"""
     try:
         # Debug logging
-        logging.info(f"Chat endpoint received: message='{message}', voice='{voice}'")
+        logging.info(f"Chat endpoint received: message='{message}', voice='{voice}', model='{model}'")
 
         if not message or not message.strip():
             logging.error(f"Empty message received: '{message}'")
             return {"error": "No message provided"}
-        
+
         # Get conversation session
         assistant = conversation_manager.get_session()
-        
+
+        # Use specified model or default to mistral
+        selected_model = model if model else "mistral:latest"
+
         # Get AI response with thinking
-        thinking, ai_response = assistant.query_ollama_with_thinking(message)
+        thinking, ai_response = assistant.query_ollama_with_thinking(message, model=selected_model)
         
         # Format thinking for display
         formatted_thinking = format_thinking_for_display(thinking)

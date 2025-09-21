@@ -1,6 +1,13 @@
 {
   "tasks": [
     {
+      "status": "done",
+      "assignee": null,
+      "estimated_hours": 3,
+      "dependencies": [0],
+      "tags": ["critical", "bugfix", "microphone", "permissions", "ui"]
+    },
+    {
       "id": 1,
       "title": "Complete XTTS_SPEAKERS definition in voice_models.py",
       "description": "Add all 50+ Coqui XTTS built-in speakers with metadata",
@@ -42,7 +49,7 @@
       "description": "Update web_voice_assistant.py to show all available voices",
       "priority": "high",
       "category": "web-ui",
-      "status": "todo",
+      "status": "done",
       "assignee": null,
       "estimated_hours": 2,
       "dependencies": [1, 2],
@@ -151,7 +158,7 @@
       "priority": "low",
       "category": "audio",
       "status": "todo",
-      "assignee": null,
+      "assignee": null,,
       "estimated_hours": 2,
       "dependencies": [10],
       "tags": ["feature", "audio"]
@@ -303,7 +310,11 @@
     {
       "id": 25,
       "title": "Learning & Skills Framework",
-      "description": "Design and implement a framework for the assistant to grow and learn over time. It should:\n- Save interaction history and outcomes to local memory for retrieval and adaptation.\n- Support pluggable 'skills' (scripts or modules) that can be added, updated, or removed.\n- Track user preferences (voices, commands, workflows) and use them to auto-suggest actions.\n- Include developer docs on how to add new skills safely.",
+      "description": "Design and implement a framework for the assistant to grow and learn over time. It should:
+- Save interaction history and outcomes to local memory for retrieval and adaptation.
+- Support pluggable 'skills' (scripts or modules) that can be added, updated, or removed.
+- Track user preferences (voices, commands, workflows) and use them to auto-suggest actions.
+- Include developer docs on how to add new skills safely.",
       "priority": "high",
       "category": "ai-learning",
       "status": "todo",
@@ -316,7 +327,7 @@
   "metadata": {
     "created": "2025-09-21",
     "version": "1.0",
-    "total_tasks": 23,
-    "total_estimated_hours": 67
+    "total_tasks": 24,
+    "total_estimated_hours": 70
   }
 }

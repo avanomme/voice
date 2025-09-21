@@ -330,6 +330,18 @@ def get_all_voices():
                 "accent": accent,
                 "gender": voice_info["gender"]
             })
+            
+    # Add VCTK voices for Coqui
+    for voice_id, voice_info in VCTK_BRITISH_VOICES.items():
+        accent = voice_info["accent"]
+        if accent in voices_by_accent:
+            voices_by_accent[accent].append({
+                "id": voice_id,
+                "engine": "coqui",
+                "name": voice_info["name"],
+                "accent": accent,
+                "gender": voice_info["gender"]
+            })
     
     return voices_by_accent
 

@@ -21,9 +21,8 @@ class VoiceAssistantLogger:
             log_dir: Directory to store log files. Defaults to ./logs/ in the project directory
         """
         if log_dir is None:
-            # Use project root logs directory
-            project_root = Path(__file__).parent.parent.parent
-            self.log_dir = project_root / "logs"
+            # Use absolute path to project logs directory
+            self.log_dir = Path.home() / "voice-assistant" / "logs"
         else:
             self.log_dir = log_dir
 

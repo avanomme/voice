@@ -9,7 +9,12 @@ import requests
 import json
 import os
 import tempfile
+import uuid
+from datetime import datetime
 from typing import Tuple, Dict, Any, Optional
+
+from memory_manager import get_memory_manager
+from self_modifier import get_self_modifier
 
 class VoiceAssistant:
     def __init__(self):
@@ -17,6 +22,13 @@ class VoiceAssistant:
         self.whisper_model = whisper.load_model("base")
         self.ollama_url = "http://localhost:11434/api/generate"
         self.conversation_history = []
+        self.memory = get_memory_manager()
+        self.self_modifier = get_self_modifier()
+        self.session_id = str(uuid.uuid4())
+
+        # Load conversation history from memory
+        self.conversation_history = self.memory.get_conversation_history(self.session_id, limit=20)
+
         print("Voice Assistant initialized")
         
     def transcribe(self, audio_data: bytes) -> str:
